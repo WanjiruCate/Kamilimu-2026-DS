@@ -1,0 +1,13 @@
+# Pin versions so the deployed service matches the environment the model was
+# trained and tested in. The model file must be loaded with the same
+# scikit-learn version that saved it (see model/metadata.json).
+scikit-learn==1.9.1
+pandas==3.0.6
+joblib
+fastapi==0.142.2
+uvicorn[standard]
+pydantic==2.13.5
+gradio==6.29.1
+litellm==1.104.0
+pytest
+httpx

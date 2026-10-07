@@ -1,0 +1,49 @@
+{
+  "model_version": "1.0.0",
+  "trained_at": "2026-10-07T09:29:43+00:00",
+  "sklearn_version": "1.9.1",
+  "model": "StandardScaler + KNeighborsRegressor(n_neighbors=10)",
+  "training_rows": 1460,
+  "target": "SalePrice",
+  "features": [
+    "OverallQual",
+    "GrLivArea",
+    "GarageCars",
+    "TotalBsmtSF",
+    "YearBuilt",
+    "FullBath"
+  ],
+  "numeric_ranges": {
+    "OverallQual": [
+      1.0,
+      10.0
+    ],
+    "GrLivArea": [
+      334.0,
+      5642.0
+    ],
+    "GarageCars": [
+      0.0,
+      4.0
+    ],
+    "TotalBsmtSF": [
+      0.0,
+      6110.0
+    ],
+    "YearBuilt": [
+      1872.0,
+      2010.0
+    ],
+    "FullBath": [
+      0.0,
+      3.0
+    ]
+  },
+  "validation": {
+    "split": "random 80/20, random_state=42",
+    "mae": 20880.5,
+    "linear_regression_mae": 25319.86,
+    "median_baseline_mae": 59568.25
+  },
+  "intended_use": "Classroom practice only. Historical Ames, Iowa sales; not a valuation service."
+}
