@@ -148,3 +148,8 @@ notebook/templates/*.html
 
 # Temporary files used for testing
 tmp/
+
+# Secrets and local runtime files
+.env
+.pytest_cache/
+feedback.jsonl

@@ -81,9 +81,13 @@ The course is taught by experienced data science professionals:
 - SHAP analysis for feature importance
 - Feedback on innovation technical solutions
 
-### Deployment
-**Instructor:** Wanjiru Catherine
-- Deploying trained models on HuggingFace Spaces
+### Deployment & Agentic AI
+**Instructor:** Wanjiru Catherine  
+**Materials:** [`Deploying ML Solutions/`](Deploying%20ML%20Solutions/) ([session plan](Deploying%20ML%20Solutions/README.md))
+- Saving pipelines, serving predictions with FastAPI, and building a Gradio UI
+- Testing, Docker, and deploying to any host (e.g. Hugging Face Spaces)
+- Model cards and monitoring
+- Agentic AI: tools, handoffs, guardrails, and evaluation with provider-agnostic LLMs
 - Innovation solution deployment
 
 
