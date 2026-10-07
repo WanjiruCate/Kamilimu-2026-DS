@@ -41,24 +41,28 @@ docker run -p 7860:7860 house-price-service
 To use a real LLM for the agent, pass the settings as environment variables:
 
 ```bash
-docker run -p 7860:7860 -e AGENT_MODEL=groq/llama-3.3-70b-versatile -e GROQ_API_KEY=... house-price-service
+docker run -p 7860:7860 -e AGENT_MODEL=groq/openai/gpt-oss-120b -e GROQ_API_KEY=... house-price-service
 ```
 
 ## Configuring the agent's language model
 
-Leave `AGENT_MODEL` unset to use the free, offline `ScriptedModel`. Otherwise
-set it to any [LiteLLM model string](https://docs.litellm.ai/docs/providers)
-and provide that provider's key as an environment variable or host secret:
+The agent reaches models through [LiteLLM](https://docs.litellm.ai/docs/providers),
+one free library for many providers. Leave `AGENT_MODEL` unset to use the free,
+offline `ScriptedModel`. Otherwise set it to a LiteLLM model string and provide
+that provider's key as an environment variable or host secret. These options
+are free (`agent.FREE_MODELS`):
 
 | Provider | `AGENT_MODEL` | Key variable |
 | --- | --- | --- |
-| Ollama (local, free) | `ollama_chat/qwen2.5:7b` | none; run `ollama pull qwen2.5:7b` first |
-| Groq | `groq/llama-3.3-70b-versatile` | `GROQ_API_KEY` |
-| Google Gemini | `gemini/gemini-2.5-flash` | `GEMINI_API_KEY` |
-| OpenRouter | `openrouter/meta-llama/llama-3.3-70b-instruct:free` | `OPENROUTER_API_KEY` |
+| Google Gemini | `gemini/gemini-2.5-flash` | `GEMINI_API_KEY` ([get one](https://aistudio.google.com/apikey)) |
+| Groq | `groq/openai/gpt-oss-120b` | `GROQ_API_KEY` ([get one](https://console.groq.com/keys)) |
+| OpenRouter | `openrouter/openrouter/free` | `OPENROUTER_API_KEY` ([get one](https://openrouter.ai/keys)) |
+| Ollama (local) | `ollama_chat/qwen2.5:7b` | none; run `ollama pull qwen2.5:7b` first |
 
-Never commit keys. Tests always run offline. To run the agent evaluation
-against your configured LLM, use `EVAL_WITH_LLM=1 python -m pytest tests/test_agent.py`.
+Free tiers have rate limits and model names change; check the provider's page
+if one stops working. Never commit keys. Tests always run offline. To run the
+agent evaluation against your configured model, use
+`EVAL_WITH_LLM=1 python -m pytest tests/test_agent.py`.
 
 ## Deploying
 

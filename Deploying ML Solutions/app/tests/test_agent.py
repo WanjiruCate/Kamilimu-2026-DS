@@ -78,20 +78,13 @@ def test_tool_schemas_are_portable():
     assert "'title'" not in text and "'examples'" not in text
 
 
-def test_parse_reply_reads_tool_calls_and_skips_bad_json():
-    text = (
-        '<tool_call>\n{"name": "search_faq", "arguments": {"query": "submission"}}\n</tool_call>'
-        "<tool_call>{not json}</tool_call>"
-    )
-    reply = agent.parse_reply(text)
-    assert [c.name for c in reply.tool_calls] == ["search_faq"]
-    assert reply.tool_calls[0].arguments == {"query": "submission"}
-    assert reply.content is None
-
-
-def test_parse_reply_plain_answer():
-    reply = agent.parse_reply("Submit your repository [projects-02].")
-    assert reply.tool_calls == [] and reply.content.endswith("[projects-02].")
+def test_free_model_needs_its_key(monkeypatch):
+    monkeypatch.delenv("GROQ_API_KEY", raising=False)
+    with pytest.raises(RuntimeError, match="GROQ_API_KEY"):
+        agent.free_model("groq")
+    monkeypatch.setenv("GROQ_API_KEY", "test")
+    assert agent.free_model("groq").name == agent.FREE_MODELS["groq"]["model"]
+    assert agent.free_model("ollama").name.startswith("ollama_chat/")
 
 
 def test_invalid_tool_arguments_return_error_not_crash():

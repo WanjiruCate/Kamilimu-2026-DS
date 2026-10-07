@@ -9,14 +9,16 @@ Anything else, or anything risky, is handed off to a human.
 
 The language model is pluggable. With no configuration, a deterministic
 ``ScriptedModel`` stands in for the LLM so the loop runs instantly, offline.
-``LocalModel`` runs a real open-weights LLM on your own machine or in Colab
-with Hugging Face ``transformers``: no account, API key, or cost. Set
-``AGENT_MODEL`` to a model ID to use it, e.g.
+``LiteLLMModel`` reaches a real LLM through LiteLLM, one interface to many
+providers. ``FREE_MODELS`` lists options that cost nothing; set
+``AGENT_MODEL`` to any LiteLLM model string to use one, e.g.
 
-    AGENT_MODEL=Qwen/Qwen2.5-1.5B-Instruct
+    AGENT_MODEL=gemini/gemini-2.5-flash        # needs GEMINI_API_KEY (free)
+    AGENT_MODEL=groq/openai/gpt-oss-120b       # needs GROQ_API_KEY (free)
+    AGENT_MODEL=openrouter/openrouter/free     # needs OPENROUTER_API_KEY (free)
+    AGENT_MODEL=ollama_chat/qwen2.5:7b         # no key; needs Ollama running
 
-Any other model only needs a class with the same ``complete()`` method;
-nothing else in this file changes.
+Nothing else in this file changes when you swap models.
 """
 
 import json
@@ -98,8 +100,8 @@ class Tool:
     fn: Callable[[BaseModel], dict]
 
     def schema(self):
-        """The tool description sent to the LLM, in the JSON-schema format
-        that open and hosted models alike understand."""
+        """The tool description sent to the LLM (OpenAI-style JSON schema,
+        which LiteLLM translates for every provider)."""
         return {
             "type": "function",
             "function": {
@@ -378,82 +380,71 @@ class ScriptedModel:
         return ModelReply(tool_calls=[ToolCall(uuid.uuid4().hex[:8], name, arguments)])
 
 
-DEFAULT_LOCAL_MODEL = "Qwen/Qwen2.5-1.5B-Instruct"
-ROUTER_PREFILL = '<tool_call>\n{"name": "transfer_to_'
-TOOL_CALL_PATTERN = re.compile(r"<tool_call>\s*(\{.*?\})\s*</tool_call>", re.DOTALL)
+# Free options, all reached through the same LiteLLM call. Free tiers and model
+# names change; check the provider's page if one stops working.
+FREE_MODELS = {
+    "gemini": {
+        "model": "gemini/gemini-2.5-flash",
+        "key": "GEMINI_API_KEY",
+        "how": "Free key from a Google account: https://aistudio.google.com/apikey",
+    },
+    "groq": {
+        "model": "groq/openai/gpt-oss-120b",
+        "key": "GROQ_API_KEY",
+        "how": "Free key, no card needed: https://console.groq.com/keys",
+    },
+    "openrouter": {
+        "model": "openrouter/openrouter/free",
+        "key": "OPENROUTER_API_KEY",
+        "how": "Free key: https://openrouter.ai/keys (routes to a free model that supports tools)",
+    },
+    "ollama": {
+        "model": "ollama_chat/qwen2.5:7b",
+        "key": None,
+        "how": "No account or key: runs on your own machine (or a Colab GPU) with Ollama",
+    },
+}
 
 
-class LocalModel:
-    """An open-weights LLM running inside this Python process with Hugging
-    Face ``transformers``. No account, API key, or cost: the model is
-    downloaded once (about 3 GB for the default) and runs on your own CPU or
-    GPU. Any chat model whose template supports tools works, e.g.
-    ``Qwen/Qwen2.5-0.5B-Instruct`` (faster, weaker) or
-    ``Qwen/Qwen2.5-7B-Instruct`` (needs a large GPU)."""
+class LiteLLMModel:
+    """Any model LiteLLM supports, through one function: Gemini, Groq,
+    OpenRouter, Ollama, Mistral, Hugging Face, Anthropic, OpenAI, and more.
+    API keys are read from environment variables, never from code."""
 
-    def __init__(self, model_id=DEFAULT_LOCAL_MODEL, max_new_tokens=300):
-        import torch
-        from transformers import AutoModelForCausalLM, AutoTokenizer
-
-        self.name = model_id
-        self.max_new_tokens = max_new_tokens
-        self.device = "cuda" if torch.cuda.is_available() else "cpu"
-        self.tokenizer = AutoTokenizer.from_pretrained(model_id)
-        self.model = AutoModelForCausalLM.from_pretrained(
-            model_id, dtype=torch.float16 if self.device == "cuda" else torch.float32
-        ).to(self.device)
+    def __init__(self, model_name, temperature=0):
+        self.name = model_name
+        self.temperature = temperature
 
     def complete(self, agent, messages, tools):
-        prompt = self.tokenizer.apply_chat_template(
-            _for_chat_template(messages),
+        import litellm
+
+        response = litellm.completion(
+            model=self.name,
+            messages=messages,
             tools=[t.schema() for t in tools] or None,
-            add_generation_prompt=True,
-            tokenize=False,
+            temperature=self.temperature,
         )
-        # A router must hand off, never answer. Small models often ignore that
-        # instruction, so we start the reply for them ("prefill"): the model
-        # only chooses where to route.
-        prefill = ROUTER_PREFILL if agent.handoffs and not agent.tools else ""
-        inputs = self.tokenizer(prompt + prefill, return_tensors="pt").to(self.device)
-        output = self.model.generate(**inputs, max_new_tokens=self.max_new_tokens, do_sample=False)
-        text = self.tokenizer.decode(output[0][inputs["input_ids"].shape[1]:], skip_special_tokens=True)
-        return parse_reply(prefill + text)
+        message = response.choices[0].message
+        calls = [
+            ToolCall(c.id, c.function.name, json.loads(c.function.arguments or "{}"))
+            for c in (message.tool_calls or [])
+        ]
+        return ModelReply(message.content, calls)
 
 
-def _for_chat_template(messages):
-    """Chat templates expect tool-call arguments as dicts, not JSON strings."""
-    prepared = []
-    for m in messages:
-        m = {**m, "content": m.get("content") or ""}
-        if m.get("tool_calls"):
-            m["tool_calls"] = [
-                {"type": "function", "function": {
-                    "name": c["function"]["name"],
-                    "arguments": json.loads(c["function"]["arguments"]),
-                }}
-                for c in m["tool_calls"]
-            ]
-        prepared.append(m)
-    return prepared
-
-
-def parse_reply(text):
-    """Split raw model text into tool calls and any remaining answer text.
-    Small models sometimes write malformed JSON; we skip it rather than crash."""
-    calls = []
-    for raw in TOOL_CALL_PATTERN.findall(text):
-        try:
-            data = json.loads(raw)
-            calls.append(ToolCall(uuid.uuid4().hex[:8], data["name"], data.get("arguments") or {}))
-        except (json.JSONDecodeError, KeyError, TypeError):
-            continue
-    answer = TOOL_CALL_PATTERN.sub("", text).strip()
-    return ModelReply(answer or None, calls)
+def free_model(provider):
+    """A LiteLLMModel for one of FREE_MODELS, with a clear message if its key is missing."""
+    if provider not in FREE_MODELS:
+        raise ValueError(f"Choose one of {list(FREE_MODELS)}, or pass any LiteLLM model string to LiteLLMModel.")
+    choice = FREE_MODELS[provider]
+    if choice["key"] and not os.getenv(choice["key"]):
+        raise RuntimeError(f"Set {choice['key']} first. {choice['how']}")
+    return LiteLLMModel(choice["model"])
 
 
 def default_model():
     name = os.getenv("AGENT_MODEL")
-    return LocalModel(name) if name else ScriptedModel()
+    return LiteLLMModel(name) if name else ScriptedModel()
 
 
 # ---------------------------------------------------------------------------
