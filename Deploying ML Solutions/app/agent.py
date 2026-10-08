@@ -13,7 +13,7 @@ The language model is pluggable. With no configuration, a deterministic
 providers. ``FREE_MODELS`` lists options that cost nothing; set
 ``AGENT_MODEL`` to any LiteLLM model string to use one, e.g.
 
-    AGENT_MODEL=gemini/gemini-2.5-flash        # needs GEMINI_API_KEY (free)
+    AGENT_MODEL=gemini/gemini-3.8-flash        # needs GEMINI_API_KEY (free)
     AGENT_MODEL=groq/openai/gpt-oss-120b       # needs GROQ_API_KEY (free)
     AGENT_MODEL=openrouter/openrouter/free     # needs OPENROUTER_API_KEY (free)
     AGENT_MODEL=ollama_chat/qwen2.5:7b         # no key; needs Ollama running
@@ -384,7 +384,7 @@ class ScriptedModel:
 # names change; check the provider's page if one stops working.
 FREE_MODELS = {
     "gemini": {
-        "model": "gemini/gemini-2.5-flash",
+        "model": "gemini/gemini-3.8-flash",
         "key": "GEMINI_API_KEY",
         "how": "Free key from a Google account: https://aistudio.google.com/apikey",
     },
