@@ -1,4 +1,4 @@
-# Case study 3: which power source is on?
+# Case study 3: Which power source is on?
 
 GridWatch sensors in six Sierra Leone hospitals report voltage and frequency about every two minutes. They do not report whether the load is on the grid, on solar, or on a generator. nLine's current system fills that in with hand-written rules. This folder is the KamiLimu pipeline that reads the **entire** extract, rebuilds those rules as a baseline, fits several time-series models, explains the chosen model with SHAP, and serves it from an API a web page or a phone can call.
 
