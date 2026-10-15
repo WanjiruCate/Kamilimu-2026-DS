@@ -1,0 +1,11 @@
+# Pins match the environment that saved model.joblib.
+numpy>=2.0
+pandas==2.2.3
+scikit-learn==1.9.0
+joblib
+pyarrow
+fastapi
+uvicorn[standard]
+pydantic
+pytest
+httpx

@@ -1,0 +1,5 @@
+work/
+__pycache__/
+.pytest_cache/
+*.pyc
+tests/__pycache__/

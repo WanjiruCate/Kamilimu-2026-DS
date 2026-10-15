@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Power source console</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #1c1917;
+      --muted: #57534e;
+      --line: #e7e5e4;
+      --paper: #fafaf9;
+      --grid: #1d4ed8;
+      --solar: #b45309;
+      --gen: #c2410c;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font: 16px/1.45 "Segoe UI", Helvetica, sans-serif;
+      color: var(--ink);
+      background: var(--paper);
+    }
+    header, main { max-width: 980px; margin: 0 auto; padding: 24px 20px; }
+    header { border-bottom: 1px solid var(--line); }
+    h1 { font-size: 1.6rem; margin: 0 0 6px; }
+    h2 { font-size: 1.15rem; margin: 0 0 10px; }
+    p, li { color: var(--muted); }
+    .layout { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 20px; }
+    section {
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    label { display: block; font-size: 0.85rem; margin: 10px 0 4px; }
+    select, button {
+      font: inherit;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      padding: 8px 10px;
+      background: white;
+    }
+    button { background: var(--ink); color: white; border: 0; cursor: pointer; }
+    button.secondary { background: white; color: var(--ink); border: 1px solid var(--line); }
+    .row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+    .badge {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      color: white;
+      font-weight: 650;
+      letter-spacing: 0.02em;
+    }
+    .badge.grid { background: var(--grid); }
+    .badge.solar { background: var(--solar); }
+    .badge.generator { background: var(--gen); }
+    .bar { height: 10px; background: var(--line); border-radius: 99px; overflow: hidden; }
+    .bar > span { display: block; height: 100%; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+    th, td { text-align: left; padding: 6px 4px; border-bottom: 1px solid var(--line); }
+    pre {
+      background: #1c1917;
+      color: #fafaf9;
+      padding: 12px;
+      border-radius: 8px;
+      overflow: auto;
+      font-size: 0.82rem;
+    }
+    @media (max-width: 800px) {
+      .layout { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Power source console</h1>
+    <p>Case study 3. Each request is one sensor window. A phone or another web app sends the same JSON to <code>/predict</code>.</p>
+    <p id="meta">Loading model info…</p>
+  </header>
+  <main>
+    <div class="layout">
+      <section>
+        <h2>Score a window</h2>
+        <label for="example">Holdout example</label>
+        <select id="example"></select>
+        <label for="model">Model</label>
+        <select id="model">
+          <option value="best">Best holdout model</option>
+          <option value="rules">Causal rules</option>
+          <option value="hgb">Gradient boosting</option>
+          <option value="online">Online logistic</option>
+          <option value="lstm">LSTM</option>
+          <option value="rnn">RNN</option>
+        </select>
+        <div class="row">
+          <button id="score" type="button">Score window</button>
+          <button id="feedback" class="secondary" type="button">Send label as generator feedback</button>
+        </div>
+        <div id="result" style="margin-top: 16px"></div>
+      </section>
+      <section>
+        <h2>Holdout generator hours</h2>
+        <p>Intervals are capped at 30 minutes so a silent sensor is not counted as a day of runtime.</p>
+        <div id="usage"></div>
+      </section>
+    </div>
+    <section>
+      <h2>Why the boosting model says what it says</h2>
+      <p>These are mean absolute SHAP values on a holdout sample: how much each feature moves the probability of <strong>generator</strong>. The full beeswarm, dependence, and waterfall plots are in the notebook.</p>
+      <div id="shap"></div>
+    </section>
+    <section>
+      <h2>How a mobile app calls this</h2>
+      <p>The page you are looking at is just a client. A React Native, Flutter, or Kotlin app posts the same body. The contract is <code>POST /predict</code>.</p>
+      <pre id="payload">loading example…</pre>
+    </section>
+  </main>
+  <script>
+    const exampleSelect = document.querySelector("#example");
+    const modelSelect = document.querySelector("#model");
+    const result = document.querySelector("#result");
+    let examples = [];
+
+    function badge(label) {
+      return `<span class="badge ${label}">${label}</span>`;
+    }
+
+    function bars(probabilities) {
+      const colors = { grid: "#1d4ed8", solar: "#b45309", generator: "#c2410c" };
+      return Object.entries(probabilities).map(([name, value]) => `
+        <div style="margin: 8px 0">
+          <div>${name} ${(value * 100).toFixed(1)}%</div>
+          <div class="bar"><span style="width:${value * 100}%; background:${colors[name]}"></span></div>
+        </div>`).join("");
+    }
+
+    function currentPayload() {
+      const example = examples[exampleSelect.selectedIndex];
+      return {
+        site_id: example.site_id,
+        room: example.room,
+        available_power_sources: example.available_power_sources,
+        site_median_frequency: example.site_median_frequency,
+        n_sensors_in_bucket: example.n_sensors_in_bucket,
+        model: modelSelect.value,
+        history: example.history
+      };
+    }
+
+    async function score() {
+      const payload = currentPayload();
+      document.querySelector("#payload").textContent = JSON.stringify(payload, null, 2);
+      const response = await fetch("/predict", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const body = await response.json();
+      const example = examples[exampleSelect.selectedIndex];
+      result.innerHTML = `
+        <p>${badge(body.active_power_source)} via ${body.model}</p>
+        ${bars(body.probabilities)}
+        <p>Teaching label on this window: <strong>${example.true_label_for_teaching}</strong>.
+        ${body.adjusted_by_rules ? "A site rule changed the model label." : ""}
+        ${body.warning ? body.warning : ""}</p>`;
+    }
+
+    async function feedback() {
+      const payload = currentPayload();
+      payload.label = "generator";
+      const response = await fetch("/online/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const body = await response.json();
+      result.insertAdjacentHTML("beforeend", `<p>Online model ${body.status}. Reset it from <code>POST /online/reset</code> before the next class.</p>`);
+    }
+
+    async function init() {
+      const [info, loaded, usage] = await Promise.all([
+        fetch("/model-info").then((r) => r.json()),
+        fetch("/examples").then((r) => r.json()),
+        fetch("/usage").then((r) => r.json())
+      ]);
+      examples = loaded;
+      document.querySelector("#meta").textContent =
+        `Model ${info.version}, trained ${info.trained_at}, default ${info.default_strategy}. ` +
+        `Feature store holds ${info.rows_in_feature_store.toLocaleString()} rows.`;
+      examples.forEach((example, index) => {
+        const option = document.createElement("option");
+        option.value = index;
+        option.textContent = `${example.true_label_for_teaching} · ${example.site_id} · ${example.room}`;
+        exampleSelect.appendChild(option);
+      });
+      const bySite = {};
+      usage.forEach((row) => {
+        bySite[row.site_id] = bySite[row.site_id] || { truth: 0, pred: 0 };
+        bySite[row.site_id].truth += row.hours_generator_true;
+        bySite[row.site_id].pred += row.hours_generator_pred;
+      });
+      const rows = Object.entries(bySite).map(([site, hours]) =>
+        `<tr><td>${site}</td><td>${hours.truth.toFixed(0)}</td><td>${hours.pred.toFixed(0)}</td></tr>`
+      ).join("");
+      document.querySelector("#usage").innerHTML =
+        `<table><thead><tr><th>Site</th><th>Label hours</th><th>Model hours</th></tr></thead><tbody>${rows}</tbody></table>`;
+      const shap = info.shap && info.shap.mean_abs_shap && info.shap.mean_abs_shap.generator;
+      const shapBox = document.querySelector("#shap");
+      if (!shap) {
+        shapBox.textContent = "SHAP summary is not in this model yet. Run python -m pipeline.shap_analysis.";
+      } else {
+        const items = Object.entries(shap);
+        const max = Math.max(...items.map((item) => item[1]));
+        shapBox.innerHTML = items.map(([name, value]) => `
+          <div style="margin: 8px 0">
+            <div>${name} ${value.toFixed(3)}</div>
+            <div class="bar"><span style="width:${(value / max) * 100}%; background:#c2410c"></span></div>
+          </div>`).join("");
+      }
+      document.querySelector("#score").addEventListener("click", score);
+      document.querySelector("#feedback").addEventListener("click", feedback);
+      if (examples.length) score();
+    }
+    init();
+  </script>
+</body>
+</html>

@@ -85,6 +85,7 @@ The course is taught by experienced data science professionals:
 **Instructor:** Wanjiru Catherine  
 **Materials:** [`Deploying ML Solutions/`](Deploying%20ML%20Solutions/) ([session plan](Deploying%20ML%20Solutions/README.md))
 - Saving pipelines, serving predictions with FastAPI, and building a Gradio UI
+- Case study 3, power-source detection: [`notebook`](Deploying%20ML%20Solutions/case_study_3_detecting_generator_usage.ipynb) and [`write-up`](Deploying%20ML%20Solutions/case_study_3/README.md). The same folder has a [Kaggle notebook](Deploying%20ML%20Solutions/case_study_3/kaggle_power_source.ipynb) for machines that cannot hold the extract in memory.
 - Testing, Docker, and deploying to any host (e.g. Hugging Face Spaces)
 - Model cards and monitoring
 - Agentic AI: tools, handoffs, guardrails, and evaluation with provider-agnostic LLMs
