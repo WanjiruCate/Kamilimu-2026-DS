@@ -1,0 +1,15 @@
+numpy>=2.0
+pandas==2.2.3
+scikit-learn==1.9.0
+scipy
+matplotlib
+pyarrow
+joblib
+sktime==1.2.0
+numba
+fastapi
+uvicorn
+pydantic
+pytest
+httpx
+shap==0.53.0

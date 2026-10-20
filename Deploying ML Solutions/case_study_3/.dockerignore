@@ -1,0 +1,7 @@
+work/
+__pycache__/
+**/__pycache__/
+.pytest_cache/
+**/.pytest_cache/
+*.pyc
+.ipynb_checkpoints/

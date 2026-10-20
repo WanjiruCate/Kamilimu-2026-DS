@@ -1,0 +1,187 @@
+{
+  "method": "permutation SHAP on HistGradientBoosting predict_proba",
+  "why_not_tree_shap": "shap.TreeExplainer raises NotImplementedError for multiclass HistGradientBoostingClassifier unless model_output='raw'.",
+  "explained_model": "hgb",
+  "rows_explained": 360,
+  "background_rows": 102,
+  "rows_per_class": {
+    "generator": 120,
+    "grid": 120,
+    "solar": 120
+  },
+  "mean_abs_shap": {
+    "generator": {
+      "abs_freq_dev_50": 0.203696,
+      "has_grid": 0.181012,
+      "trail_max_freq": 0.021366,
+      "n_sources": 0.017671,
+      "trail_std_freq": 0.017083,
+      "trail_min_freq": 0.015497,
+      "has_generator": 0.015451,
+      "n_sensors_in_bucket": 0.015194,
+      "trail_mad_freq": 0.012747,
+      "freq_dev_site_median": 0.008928,
+      "trail_mean_freq": 0.007592,
+      "freq_diff_1": 0.006003,
+      "frequency": 0.004336,
+      "voltage": 0.003656,
+      "abs_volt_dev_230": 0.002929,
+      "trail_std_volt": 0.002122,
+      "hour_cos": 0.001977,
+      "hour_sin": 0.001586,
+      "dow_sin": 0.001183,
+      "dow_cos": 0.000944,
+      "volt_diff_1": 0.000775,
+      "has_solar": 0.000386,
+      "gap_minutes": 0.00033,
+      "low_voltage": 0.0
+    },
+    "grid": {
+      "has_grid": 0.397718,
+      "abs_freq_dev_50": 0.027855,
+      "n_sensors_in_bucket": 0.021503,
+      "n_sources": 0.019382,
+      "freq_dev_site_median": 0.014624,
+      "trail_mean_freq": 0.012973,
+      "trail_max_freq": 0.010119,
+      "voltage": 0.009821,
+      "trail_min_freq": 0.009464,
+      "abs_volt_dev_230": 0.00667,
+      "trail_std_volt": 0.006352,
+      "hour_cos": 0.006044,
+      "trail_std_freq": 0.003842,
+      "frequency": 0.003036,
+      "dow_sin": 0.003007,
+      "trail_mad_freq": 0.002991,
+      "freq_diff_1": 0.002601,
+      "hour_sin": 0.00252,
+      "has_generator": 0.002177,
+      "dow_cos": 0.00154,
+      "volt_diff_1": 0.001139,
+      "gap_minutes": 0.000987,
+      "has_solar": 0.000121,
+      "low_voltage": 0.0
+    },
+    "solar": {
+      "abs_freq_dev_50": 0.220446,
+      "has_grid": 0.216705,
+      "n_sources": 0.035513,
+      "trail_max_freq": 0.025723,
+      "trail_min_freq": 0.022398,
+      "n_sensors_in_bucket": 0.01771,
+      "trail_std_freq": 0.016573,
+      "trail_mean_freq": 0.014824,
+      "trail_mad_freq": 0.013929,
+      "has_generator": 0.013326,
+      "freq_dev_site_median": 0.011725,
+      "voltage": 0.009946,
+      "freq_diff_1": 0.007181,
+      "frequency": 0.006502,
+      "hour_cos": 0.006482,
+      "trail_std_volt": 0.006451,
+      "abs_volt_dev_230": 0.006294,
+      "dow_sin": 0.003509,
+      "hour_sin": 0.002894,
+      "dow_cos": 0.001519,
+      "volt_diff_1": 0.001247,
+      "gap_minutes": 0.001043,
+      "has_solar": 0.000507,
+      "low_voltage": 0.0
+    }
+  },
+  "local_examples": [
+    {
+      "true_label": "generator",
+      "base_probability": 0.3411,
+      "top_features": [
+        {
+          "feature": "abs_freq_dev_50",
+          "value": 2.6246,
+          "shap": 0.2101
+        },
+        {
+          "feature": "n_sensors_in_bucket",
+          "value": 2.0,
+          "shap": 0.0793
+        },
+        {
+          "feature": "trail_max_freq",
+          "value": 47.4158,
+          "shap": 0.0759
+        },
+        {
+          "feature": "freq_dev_site_median",
+          "value": 1.3261,
+          "shap": 0.0743
+        },
+        {
+          "feature": "has_generator",
+          "value": 1.0,
+          "shap": 0.0618
+        }
+      ]
+    },
+    {
+      "true_label": "grid",
+      "base_probability": 0.3205,
+      "top_features": [
+        {
+          "feature": "has_grid",
+          "value": 1.0,
+          "shap": 0.4402
+        },
+        {
+          "feature": "n_sources",
+          "value": 3.0,
+          "shap": -0.0831
+        },
+        {
+          "feature": "freq_dev_site_median",
+          "value": 0.2258,
+          "shap": -0.0689
+        },
+        {
+          "feature": "n_sensors_in_bucket",
+          "value": 6.0,
+          "shap": 0.0417
+        },
+        {
+          "feature": "trail_std_volt",
+          "value": 2.1949,
+          "shap": -0.0383
+        }
+      ]
+    },
+    {
+      "true_label": "solar",
+      "base_probability": 0.3385,
+      "top_features": [
+        {
+          "feature": "abs_freq_dev_50",
+          "value": 0.0927,
+          "shap": 0.2252
+        },
+        {
+          "feature": "has_grid",
+          "value": 0.0,
+          "shap": 0.173
+        },
+        {
+          "feature": "trail_min_freq",
+          "value": 50.015,
+          "shap": 0.072
+        },
+        {
+          "feature": "freq_dev_site_median",
+          "value": 0.0927,
+          "shap": 0.0682
+        },
+        {
+          "feature": "has_generator",
+          "value": 0.0,
+          "shap": 0.0631
+        }
+      ]
+    }
+  ]
+}

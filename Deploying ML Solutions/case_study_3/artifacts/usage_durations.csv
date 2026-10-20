@@ -1,0 +1,32 @@
+site_id,room,respondent_id,hours_generator_true,hours_generator_pred,hours_grid_true,hours_grid_pred,hours_solar_true,hours_solar_pred
+bonthe,Male ward - Solar & Generator,95E7399D,0.0,0.77,0.0,0.0,994.83,994.05
+bonthe,Maternity ward - Solar & Generator,30314B82,6.73,7.69,0.0,0.0,877.05,876.09
+bonthe,Operating theatre room  - Solar & Generator,86ABF063,6.7,6.93,0.0,0.0,1236.85,1236.62
+bonthe,Special Baby Care ward - Solar & Generator,9FD654ED,6.8,7.1,0.0,0.0,1257.64,1257.34
+kabala,Medical Superintendent Office  - Solar & Generator,CD9B9362,44.56,51.23,0.0,0.0,1248.32,1241.65
+kabala,Paediatric pharmacy  - Solar & Generator,DD49499C,29.94,36.07,0.0,0.0,597.1,590.97
+kabala,Sarelogy Room - Solar & Generator,7591C426,49.2,60.96,0.0,0.0,1264.47,1252.72
+kabala,X-Ray room - Solar & Generator,A45DEF14,37.67,43.86,0.0,0.0,935.57,929.38
+kambia,Administration building - Solar & Generator,65E8690F,0.0,0.69,0.0,0.0,578.19,577.5
+kambia,Matron Office - Solar & Generator,42D5AFD3,0.1,0.48,0.0,0.0,578.25,577.87
+kambia,Paediatric/Resuscitation Room - Solar & Generator,794A4021,90.3,95.26,0.0,0.0,821.43,816.47
+kambia,SCBU WARD - Solar,BC894308,0.0,0.0,0.0,0.0,1231.08,1231.08
+kambia,Special Baby Care ward - Solar,AE9D9E66,0.0,0.0,0.0,0.0,1202.05,1202.05
+masanga,Administration Building - Solar & Generator,31581AC3,30.73,32.83,0.0,0.0,1398.03,1395.94
+masanga,Emergency room  - Solar & Generator,40101E61,30.17,33.12,0.0,0.0,1352.69,1349.74
+masanga,Operation theatre - Solar & Generator,7A696BB0,27.7,29.04,0.0,0.0,1068.91,1067.56
+masanga,Surgical ward - Solar & Generator,A7081050,22.37,24.13,0.0,0.0,1175.23,1173.47
+ola_during,HDU - Grid w/Solar & Generator Backup,285A769C,0.03,0.47,1266.26,1233.45,173.47,205.85
+ola_during,Intensive Care Unit - Grid w/Solar & Generator Backup,8DF9A946,0.03,2.17,1141.2,1127.42,163.32,174.96
+ola_during,Maintenance Office  - Grid w/Solar & Generator Backup,10DA907C,0.0,0.0,218.63,206.22,31.63,44.05
+ola_during,Special Care Baby Unit - Grid w/Solar & Generator Backup,181DEF5E,0.0,0.0,94.41,98.92,11.28,6.77
+ola_during,Step down ward two - Grid w/Solar & Generator Backup,36291A37,0.0,0.9,1259.73,1184.27,179.27,253.83
+ola_during,Step down ward two - Grid w/Solar & Generator Backup,E76A2F18,0.0,0.53,1287.02,1181.98,152.23,256.74
+princess_christian,D.M.S2 - Grid w/Solar Backup,31AA625C,0.0,0.0,783.17,779.48,41.2,44.9
+princess_christian,HDU - Grid w/Generator Backup,CE9340E1,0.0,0.0,288.11,288.11,0.0,0.0
+princess_christian,HOD Maintenance Office - Grid w/Solar Backup,274B46C5,0.0,0.0,628.05,625.86,30.84,33.02
+princess_christian,Labour - Grid w/Solar & Generator Backup,7CF431FF,0.03,0.57,480.14,688.77,342.29,133.12
+princess_christian,Labour ward/Maternity - Grid w/Solar & Generator Backup,23D03AB0,0.0,0.83,964.95,1190.53,470.51,244.11
+princess_christian,Operating Theatre - Grid w/Solar & Generator Backup,37B7AE20,0.0,0.33,1097.31,1260.61,338.79,175.15
+princess_christian,Ward 2 - Grid w/Solar Backup,41570E47,0.0,0.0,1224.96,1229.72,38.55,33.79
+princess_christian,Ward 2 - Grid w/Solar Backup,E3670099,0.0,0.0,1274.33,1278.43,45.77,41.66

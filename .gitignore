@@ -146,8 +146,10 @@ notebook/templates/*.html
 .pixi
 *.egg-info
 
-# Temporary files used for testing
-tmp/
+Deploying ML Solutions/case_study_3/work/
+
+# Proprietary case-study extracts. They stay on disk and out of git.
+Kamilimu_Case_Study_Dataset/
 
 # Secrets and local runtime files
 .env
